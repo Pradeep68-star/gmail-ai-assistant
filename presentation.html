@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intelligent Mail-Caller Assistant</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Light Mode Defaults */
+            --bg-color: #f0f9ff; /* Blue 50 */
+            --text-color: #1f2937;
+            --card-bg: #ffffff;
+            --code-bg: #111827;
+            --primary-color: #06b6d4; /* Cyan 500 */
+        }
+
+        .dark {
+            /* Dark Mode Overrides */
+            --bg-color: #111827; /* Gray 900 */
+            --text-color: #f3f4f6;
+            --card-bg: #1f2937; /* Gray 800 */
+            --code-bg: #1f2937;
+            --primary-color: #22d3ee; /* Cyan 400 */
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* Hero Section Gradient Animation - Cyan/Teal Theme */
+        .animated-gradient {
+            background: linear-gradient(90deg, #0f766e, #0d9488, #06b6d4, #0d9488, #0f766e);
+            background-size: 200% 200%;
+            animation: backgroundPan 15s ease infinite;
+        }
+        @keyframes backgroundPan {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        /* Scroll Animation Utility Classes */
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .fade-in-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Code Block Styling */
+        pre {
+            background-color: var(--code-bg);
+            color: #e2e8f0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+        }
+        .code-keyword { color: #81c784; } 
+        .code-function { color: #64b5f6; } 
+        .code-string { color: #ffb74d; } 
+        .code-comment { color: #9e9e9e; } 
+        .code-variable { color: #f48fb1; } 
+        .bg-card-bg { background-color: var(--card-bg); }
+    </style>
+</head>
+<body>
+
+    <header class="animated-gradient text-white text-center py-24 px-4 shadow-2xl relative">
+        <button id="mode-toggle" class="absolute top-6 right-6 p-2 rounded-full bg-teal-600 hover:bg-teal-700 transition-colors">
+            <svg id="moon-icon" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+            <svg id="sun-icon" class="w-6 h-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+        </button>
+        <h1 class="text-5xl md:text-6xl font-extrabold mb-4 fade-in-up visible">The Intelligent Mail-Caller 📞</h1>
+        <p class="text-xl md:text-2xl text-teal-100 max-w-3xl mx-auto fade-in-up visible" style="transition-delay: 0.2s;">Converts your important email events into reliable voice call reminders.</p>
+    </header>
+
+    <main class="container mx-auto px-6 py-16">
+
+        <section class="mb-24">
+            <h2 class="text-4xl font-bold mb-12 text-teal-600 dark:text-teal-400 text-center fade-in-up">The Three-Step Automation Flow</h2>
+            <div class="bg-card-bg p-8 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 transition-colors">
+                <div class="grid md:grid-cols-3 gap-8">
+                    
+                    <div id="status-read" class="p-6 rounded-xl border-4 border-transparent text-center transition-all bg-gray-100 dark:bg-gray-700">
+                        <svg class="w-12 h-12 mx-auto mb-3 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                        <h3 class="font-bold text-xl mb-1 text-gray-900 dark:text-gray-100">1. Inbox Scan & Parse</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Securely fetch emails, decode content (text/html) and match against keywords.</p>
+                    </div>
+
+                    <div id="status-parse" class="p-6 rounded-xl border-4 border-transparent text-center transition-all bg-gray-100 dark:bg-gray-700">
+                        <svg class="w-12 h-12 mx-auto mb-3 text-teal-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <h3 class="font-bold text-xl mb-1 text-gray-900 dark:text-gray-100">2. Time Intelligence</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">The **`dateparser`** library extracts and validates future, IST-aware event deadlines.</p>
+                    </div>
+
+                    <div id="status-call" class="p-6 rounded-xl border-4 border-transparent text-center transition-all bg-gray-100 dark:bg-gray-700">
+                        <svg class="w-12 h-12 mx-auto mb-3 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+                        <h3 class="font-bold text-xl mb-1 text-gray-900 dark:text-gray-100">3. Twilio Reminders</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Multiple voice calls are scheduled using `threading.Timer` to ensure you never miss the time.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-24 bg-teal-50 dark:bg-gray-800 p-12 rounded-2xl shadow-inner border border-teal-200 dark:border-gray-700 transition-colors">
+            <h2 class="text-4xl font-bold mb-8 text-center text-teal-600 dark:text-teal-400 fade-in-up">Live Demo Simulation: Try the Parser!</h2>
+            <p class="text-center text-gray-700 dark:text-gray-300 mb-6 max-w-xl mx-auto">This simulation replicates the core logic (keyword match + future time check).</p>
+            
+            <div class="max-w-2xl mx-auto fade-in-up" style="transition-delay: 100ms;">
+                <textarea id="email-input" class="w-full h-32 p-4 border rounded-lg focus:ring-4 focus:ring-teal-300 dark:bg-gray-700 dark:border-gray-600 dark:text-white shadow-sm" placeholder="e.g., The final coding challenge is next Monday at 7:30 PM. Please register soon!"></textarea>
+                <button id="demo-btn" class="mt-4 w-full bg-teal-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-teal-700 transition-colors shadow-lg dark:shadow-teal-900/50">Simulate Email Check</button>
+                <div id="demo-output" class="mt-6 p-6 bg-card-bg border border-teal-200 dark:border-gray-600 rounded-lg text-left hidden shadow-md">
+                    <p class="text-lg font-medium text-gray-800 dark:text-gray-200">Processing...</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-24 bg-card-bg p-12 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 transition-colors">
+            <h2 class="text-4xl font-bold mb-12 text-teal-600 dark:text-teal-400 text-center fade-in-up">Code: The Time Intelligence Engine</h2>
+            <div class="grid md:grid-cols-2 gap-8 items-start">
+                <pre class="fade-in-up" style="transition-delay: 100ms;"><code><span class="code-keyword">def</span> <span class="code-function">extract_event_times</span>(<span class="code-variable">text</span>):
+    <span class="code-comment"># Inject current year for flexible date formats</span>
+    <span class="code-variable">current_year</span> = datetime.now().year
+    <span class="code-variable">text_with_year</span> = re.sub(<span class="code-string">r'\b(\d{1,2}\s+(?:Jan|Feb|Mar|...))(?!\s+\d{4})'</span>,
+        <span class="code-string">rf'\1 {current_year}'</span>, <span class="code-variable">text</span>, flags=re.IGNORECASE)
+
+    <span class="code-variable">results</span> = search_dates(<span class="code-variable">text_with_year</span>, settings={
+        <span class="code-string">'PREFER_DATES_FROM'</span>: <span class="code-string">'future'</span>,
+        <span class="code-string">'RETURN_AS_TIMEZONE_AWARE'</span>: <span class="code-keyword">True</span> <span class="code-comment"># Crucial for scheduling</span>
+    })
+    
+    <span class="code-variable">found_times</span> = []
+    <span class="code-keyword">for</span> _, <span class="code-variable">dt</span> <span class="code-keyword">in</span> <span class="code-variable">results</span>:
+        <span class="code-variable">dt_ist</span> = <span class="code-variable">dt</span>.astimezone(<span class="code-variable">IST</span>)
+        <span class="code-keyword">if</span> <span class="code-variable">dt_ist</span> > datetime.now(<span class="code-variable">IST</span>) <span class="code-keyword">and</span> <span class="code-variable">dt_ist</span>.time() != datetime.min.time():
+            <span class="code-variable">found_times</span>.append(<span class="code-variable">dt_ist</span>)
+    
+    <span class="code-keyword">return</span> sorted(<span class="code-function">list</span>(<span class="code-function">set</span>(<span class="code-variable">found_times</span>)))</code></pre>
+                <div class="fade-in-up" style="transition-delay: 200ms;">
+                    <h3 class="text-2xl font-semibold mb-2 text-gray-800 dark:text-gray-200">Key Logic Highlights</h3>
+                    <ul class="list-disc list-inside space-y-3 pl-4 text-gray-700 dark:text-gray-300">
+                        <li>**Robust Parsing:** Uses the powerful `dateparser.search` library, which handles nearly all natural language date formats, unlike simple regex.</li>
+                        <li>**Contextual Clues:** The code adds the current year to incomplete dates (e.g., "Dec 25") to eliminate ambiguity.</li>
+                        <li>**Strict Future Filter:** Explicitly checks that the parsed time is **not** in the past and **must** include a specific time (e.g., "5:00 PM," not just "yesterday").</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-200 dark:bg-gray-900 text-gray-700 dark:text-gray-300 text-center py-8 mt-16 transition-colors">
+        <p>&copy; 2025 Intelligent Mail-Caller System. Made with Python, Gmail API, and Twilio.</p>
+    </footer>
+
+    <script>
+        // --- Dark/Light Mode Toggle Logic ---
+        const toggle = document.getElementById('mode-toggle');
+        const sunIcon = document.getElementById('sun-icon');
+        const moonIcon = document.getElementById('moon-icon');
+
+        const storedTheme = localStorage.getItem('theme');
+        const systemPreference = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        
+        if (storedTheme === 'dark' || (!storedTheme && systemPreference)) {
+            document.documentElement.classList.add('dark');
+            sunIcon.classList.remove('hidden');
+            moonIcon.classList.add('hidden');
+        } else {
+            document.documentElement.classList.remove('dark');
+            moonIcon.classList.remove('hidden');
+            sunIcon.classList.add('hidden');
+        }
+
+        toggle.addEventListener('click', () => {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+                moonIcon.classList.remove('hidden');
+                sunIcon.classList.add('hidden');
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+            }
+        });
+
+        // --- Scroll Animation Logic ---
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        const animatedElements = document.querySelectorAll('.fade-in-up');
+        animatedElements.forEach(el => observer.observe(el));
+
+
+        // --- Live Demo Simulation Logic (More Robust) ---
+        const demoBtn = document.getElementById('demo-btn');
+        const emailInput = document.getElementById('email-input');
+        const demoOutput = document.getElementById('demo-output');
+        
+        // Dynamic Status Elements
+        const statusRead = document.getElementById('status-read');
+        const statusParse = document.getElementById('status-parse');
+        const statusCall = document.getElementById('status-call');
+
+        // Keywords from your Python app_config
+        const keywords = ['competition', 'hackathon', 'meeting', 'coding challenge', 'contest', 'event', 'invitation', 'challange'];
+        
+        // More comprehensive regex to find date/time patterns for the demo simulation
+        const dateLikeRegex = /(((\d{1,2}\/\d{1,2}(\/\d{2,4})?|\d{1,4}-\d{1,2}-\d{1,2})|tomorrow|next\s+\w+|today|\w+\s+\d{1,2}(th|st|nd|rd)?(\s+\d{4})?)\s+(at\s+)?\d{1,2}(:\d{2})?\s*(am|pm|o\'clock|hour)?)/i;
+
+        function resetStatus() {
+            statusRead.classList.remove('border-teal-500', 'bg-teal-100', 'dark:bg-teal-900/50');
+            statusParse.classList.remove('border-teal-500', 'bg-teal-100', 'dark:bg-teal-900/50');
+            statusCall.classList.remove('border-teal-500', 'bg-teal-100', 'dark:bg-teal-900/50');
+        }
+
+        async function runDemoSimulation(emailText) {
+            resetStatus();
+            demoOutput.classList.remove('hidden');
+            demoOutput.innerHTML = '<p class="text-lg font-medium text-gray-800 dark:text-gray-200">🔍 Starting process...</p>';
+            
+            await new Promise(r => setTimeout(r, 500));
+            statusRead.classList.add('border-teal-500', 'bg-teal-100', 'dark:bg-teal-900/50');
+            demoOutput.innerHTML += '<p class="text-sm text-gray-600 dark:text-gray-400">✅ Step 1: Emails fetched and decoded.</p>';
+
+            // --- Step 1: Keyword Check ---
+            const hasKeyword = keywords.some(k => emailText.toLowerCase().includes(k));
+            await new Promise(r => setTimeout(r, 500));
+            
+            if (!hasKeyword) {
+                demoOutput.innerHTML += '<p class="text-sm text-yellow-600">🟡 No relevant keywords found. Skipping to next email.</p>';
+                await new Promise(r => setTimeout(r, 500));
+                resetStatus();
+                return { status: 'keyword_fail', message: `🟡 No relevant keywords found. Assistant would skip this email.` };
+            }
+
+            // --- Step 2: Simulated Date Parsing ---
+            statusParse.classList.add('border-teal-500', 'bg-teal-100', 'dark:bg-teal-900/50');
+            demoOutput.innerHTML += '<p class="text-sm text-gray-600 dark:text-gray-400">⚙️ Step 2: Keyword match found. Running date parser...</p>';
+            await new Promise(r => setTimeout(r, 500));
+
+            const now = Date.now();
+            const dateMatch = emailText.match(dateLikeRegex);
+            
+            if (dateMatch) {
+                const dateString = dateMatch[0].replace('at ', ' ').trim();
+                // To help Date.parse handle 19/10/25, we try a more explicit format
+                let cleanedDateString = dateString.replace(/(\d{1,2})\/(\d{1,2})\/(\d{2})/, '20$3-$2-$1');
+                
+                const parsedDate = new Date(Date.parse(cleanedDateString));
+
+                if (!isNaN(parsedDate) && parsedDate.getTime() > now) {
+                    const formattedTime = parsedDate.toLocaleDateString(undefined, {
+                        year: 'numeric', month: 'short', day: 'numeric',
+                        hour: '2-digit', minute: '2-digit', hour12: true
+                    });
+
+                    // --- Step 3: Call Scheduling ---
+                    statusCall.classList.add('border-teal-500', 'bg-teal-100', 'dark:bg-teal-900/50');
+                    demoOutput.innerHTML += '<p class="text-sm text-green-600">🕒 Success! Future date detected. Scheduling Twilio calls...</p>';
+                    await new Promise(r => setTimeout(r, 1000));
+                    
+                    resetStatus();
+                    return { 
+                        status: 'success', 
+                        message: `✅ Keyword Matched & Future Event Time Detected!`,
+                        details: {
+                            event_time_text: formattedTime,
+                            reminders: [
+                                "1. Call Scheduled: 3 hours before event",
+                                "2. Call Scheduled: 1 hour before event",
+                                "3. Call Scheduled: At the time of event"
+                            ]
+                        }
+                    };
+                }
+            }
+            
+            // If keyword passed but date failed (past or invalid)
+            demoOutput.innerHTML += '<p class="text-sm text-red-600">❌ Date failed strict check (invalid or in the past).</p>';
+            await new Promise(r => setTimeout(r, 500));
+            resetStatus();
+            return { status: 'date_fail', message: '⚠️ Keyword matched, but no valid, future time/date was detected. No calls scheduled.' };
+        }
+
+        demoBtn.addEventListener('click', async () => {
+            const emailText = emailInput.value.trim();
+            if (!emailText) {
+                demoOutput.classList.remove('hidden');
+                demoOutput.innerHTML = '<p class="text-lg font-medium text-red-600">Please enter some sample text.</p>';
+                return;
+            }
+
+            const result = await runDemoSimulation(emailText);
+
+            // Final output display
+            if (result.status === 'success') {
+                demoOutput.innerHTML = `
+                    <div class="text-left">
+                        <h4 class="font-bold text-xl mb-2 text-green-600">${result.message}</h4>
+                        <p class="mb-2"><span class="font-semibold text-gray-800 dark:text-gray-200">Event Time (Simulated IST):</span> <span class="bg-yellow-100 p-1 rounded dark:bg-yellow-900 dark:text-white">${result.details.event_time_text}</span></p>
+                        <h4 class="font-bold text-xl mb-2 mt-4 text-teal-600">📞 Twilio Actions Scheduled:</h4>
+                        <ul class="list-disc list-inside space-y-1 pl-4 text-gray-700 dark:text-gray-300">
+                            ${result.details.reminders.map(r => `<li>${r}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+            } else {
+                demoOutput.innerHTML = `<p class="text-lg font-medium ${result.status.includes('fail') ? 'text-red-600' : 'text-yellow-600'}">${result.message}</p>`;
+            }
+        });
+    </script>
+
+</body>
+</html>
