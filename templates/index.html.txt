@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gmail-Twilio Reminder Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #F9FAFB;
+            --text-color: #1F2937;
+            --text-color-muted: #6B7280;
+            --header-gradient-start: #3B82F6;
+            --header-gradient-end: #8B5CF6;
+            --card-bg: rgba(255, 255, 255, 0.8);
+            --card-border: rgba(0, 0, 0, 0.1);
+            --card-shadow: rgba(0, 0, 0, 0.1);
+            --tab-nav-border: #E5E7EB;
+            --tab-link-color: #6B7280;
+            --tab-link-active-color: #6366F1;
+            --input-bg: #FFFFFF;
+            --input-border: #D1D5DB;
+            --input-focus-border: #6366F1;
+            --input-focus-shadow: rgba(99, 102, 241, 0.4);
+            --button-gradient-start: #3B82F6;
+            --button-gradient-end: #8B5CF6;
+            --button-shadow: rgba(59, 130, 246, 0.4);
+            --activity-log-bg: #F3F4F6;
+            --activity-log-border: #E5E7EB;
+            --reminder-item-bg: #FFFFFF;
+            --reminder-item-hover-border: #A5B4FC;
+            --status-badge-bg: rgba(99, 102, 241, 0.1);
+            --status-badge-color: #4F46E5;
+            --status-badge-border: rgba(99, 102, 241, 0.3);
+            --scrollbar-thumb: #D1D5DB;
+            --scrollbar-thumb-hover: #9CA3AF;
+        }
+
+        body.dark {
+            --bg-color: #111827;
+            --text-color: #E5E7EB;
+            --text-color-muted: #9CA3AF;
+            --header-gradient-start: #60A5FA;
+            --header-gradient-end: #A78BFA;
+            --card-bg: rgba(31, 41, 55, 0.5);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --card-shadow: rgba(0, 0, 0, 0.37);
+            --tab-nav-border: rgba(255, 255, 255, 0.1);
+            --tab-link-color: #9CA3AF;
+            --tab-link-active-color: #A78BFA;
+            --input-bg: rgba(17, 24, 39, 0.8);
+            --input-border: rgba(255, 255, 255, 0.1);
+            --input-focus-border: #8B5CF6;
+            --input-focus-shadow: rgba(139, 92, 246, 0.4);
+            --button-gradient-start: #3B82F6;
+            --button-gradient-end: #8B5CF6;
+            --button-shadow: rgba(59, 130, 246, 0.4);
+            --activity-log-bg: #00000080;
+            --activity-log-border: rgba(255, 255, 255, 0.1);
+            --reminder-item-bg: rgba(55, 65, 81, 0.5);
+            --reminder-item-hover-border: rgba(167, 139, 250, 0.5);
+            --status-badge-bg: rgba(167, 139, 250, 0.2);
+            --status-badge-color: #C4B5FD;
+            --status-badge-border: rgba(167, 139, 250, 0.4);
+            --scrollbar-thumb: #4B5563;
+            --scrollbar-thumb-hover: #6B7280;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            overflow: hidden;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body.dark::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at 15% 25%, rgba(59, 130, 246, 0.3), transparent 40%),
+                        radial-gradient(circle at 85% 75%, rgba(139, 92, 246, 0.3), transparent 40%);
+            animation: aurora 15s linear infinite;
+        }
+        @keyframes aurora {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .header-title {
+            background: linear-gradient(90deg, var(--header-gradient-start), var(--header-gradient-end));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .theme-toggle-button {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            color: var(--text-color-muted);
+            transition: all 0.3s;
+        }
+        .theme-toggle-button:hover {
+            color: var(--text-color);
+            box-shadow: 0 0 10px var(--card-shadow);
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--card-border);
+            box-shadow: 0 8px 32px 0 var(--card-shadow);
+            border-radius: 1rem;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .tab-nav {
+            position: relative;
+            border-bottom: 1px solid var(--tab-nav-border);
+        }
+        .tab-link {
+            transition: color 0.3s ease;
+            color: var(--tab-link-color);
+            border-bottom: 2px solid transparent;
+        }
+        .tab-link.active { color: var(--tab-link-active-color); }
+        .tab-link:not(.active):hover { color: var(--text-color); }
+        
+        .tab-content { display: none; animation: fadeIn 0.5s ease-out; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-input {
+            background-color: var(--input-bg);
+            border: 1px solid var(--input-border);
+            color: var(--text-color);
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        .form-input::placeholder { color: var(--text-color-muted); }
+        .form-input:focus {
+            outline: none;
+            border-color: var(--input-focus-border);
+            box-shadow: 0 0 0 3px var(--input-focus-shadow);
+        }
+
+        .gradient-button {
+            background-image: linear-gradient(to right, var(--button-gradient-start), var(--button-gradient-end));
+            border: none;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .gradient-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px var(--button-shadow);
+        }
+        .gradient-button:disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+            transform: translateY(0);
+            box-shadow: none;
+        }
+
+        .activity-log {
+            background: var(--activity-log-bg);
+            border: 1px solid var(--activity-log-border);
+        }
+        .activity-log p { animation: slideInUp 0.4s ease-out; }
+        @keyframes slideInUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .activity-log::-webkit-scrollbar { width: 8px; }
+        .activity-log::-webkit-scrollbar-track { background: transparent; }
+        .activity-log::-webkit-scrollbar-thumb {
+            background-color: var(--scrollbar-thumb);
+            border-radius: 10px;
+            border: 2px solid transparent;
+            background-clip: content-box;
+        }
+        .activity-log::-webkit-scrollbar-thumb:hover { background-color: var(--scrollbar-thumb-hover); }
+
+        .reminder-item {
+            background-color: var(--reminder-item-bg);
+            border: 1px solid var(--card-border);
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+        .reminder-item:hover {
+            transform: scale(1.02);
+            border-color: var(--reminder-item-hover-border);
+        }
+        .status-badge {
+            background-color: var(--status-badge-bg);
+            color: var(--status-badge-color);
+            border: 1px solid var(--status-badge-border);
+        }
+        .status-badge.called {
+            background-color: rgba(22, 163, 74, 0.1);
+            color: #16A34A;
+            border-color: rgba(22, 163, 74, 0.3);
+        }
+        body.dark .status-badge.called {
+            background-color: rgba(74, 222, 128, 0.2);
+            color: #86EFAC;
+            border-color: rgba(74, 222, 128, 0.4);
+        }
+        .status-badge.failed {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: #EF4444;
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+        body.dark .status-badge.failed {
+            background-color: rgba(248, 113, 113, 0.2);
+            color: #FCA5A5;
+            border-color: rgba(248, 113, 113, 0.4);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <div class="container mx-auto p-4 sm:p-6 lg:p-8">
+
+        <header class="mb-8 text-center relative">
+            <button id="theme-toggle" class="theme-toggle-button absolute top-0 right-0 h-10 w-10 rounded-full flex items-center justify-center">
+                <i id="theme-icon-sun" class="fas fa-sun"></i>
+                <i id="theme-icon-moon" class="fas fa-moon hidden"></i>
+            </button>
+            <h1 class="text-4xl font-bold header-title">Gmail-Twilio Reminder Dashboard</h1>
+            <p class="mt-2" style="color: var(--text-color-muted);">Monitor emails and schedule automated phone reminders</p>
+        </header>
+
+        <div class="mb-6">
+            <div class="tab-nav">
+                <nav class="-mb-px flex space-x-6 justify-center" aria-label="Tabs">
+                    <a href="#" id="config-tab" class="tab-link active flex items-center whitespace-nowrap py-3 px-1 text-sm font-medium">
+                        <i class="fas fa-cog mr-2"></i> Configuration
+                    </a>
+                    <a href="#" id="monitor-tab" class="tab-link flex items-center whitespace-nowrap py-3 px-1 text-sm font-medium">
+                        <i class="fas fa-envelope mr-2"></i> Email Monitor
+                    </a>
+                    <a href="#" id="reminders-tab" class="tab-link flex items-center whitespace-nowrap py-3 px-1 text-sm font-medium">
+                        <i class="fas fa-calendar-alt mr-2"></i> Scheduled Reminders
+                    </a>
+                </nav>
+            </div>
+        </div>
+
+        <div id="configuration-card" class="tab-content card active p-6 sm:p-8">
+            <div class="flex items-start mb-6">
+                 <div class="bg-blue-500/20 p-3 rounded-lg mr-4 border border-blue-500/30">
+                     <i class="fas fa-cog text-blue-400 text-xl"></i>
+                 </div>
+                 <div>
+                     <h2 class="text-xl font-semibold">Configuration</h2>
+                     <p class="mt-1" style="color: var(--text-color-muted);">Configure your Gmail and Twilio credentials</p>
+                 </div>
+            </div>
+            <form id="config-form">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                    <div class="space-y-6">
+                        <div>
+                            <label for="twilio-sid" class="block text-sm font-medium" style="color: var(--text-color-muted);">Twilio Account SID</label>
+                            <input type="text" name="TWILIO_ACCOUNT_SID" id="twilio-sid" class="form-input mt-1 block w-full px-3 py-2 rounded-md shadow-sm">
+                        </div>
+                        <div>
+                            <label for="twilio-token" class="block text-sm font-medium" style="color: var(--text-color-muted);">Twilio Auth Token</label>
+                            <input type="password" name="TWILIO_AUTH_TOKEN" id="twilio-token" class="form-input mt-1 block w-full px-3 py-2 rounded-md shadow-sm" placeholder="Enter new token to update">
+                        </div>
+                        <div>
+                            <label for="twilio-phone" class="block text-sm font-medium" style="color: var(--text-color-muted);">Twilio Phone Number</label>
+                            <input type="tel" name="TWILIO_PHONE_NUMBER" id="twilio-phone" class="form-input mt-1 block w-full px-3 py-2 rounded-md shadow-sm">
+                        </div>
+                    </div>
+                    <div class="space-y-6">
+                        <div>
+                            <label for="user-phone" class="block text-sm font-medium" style="color: var(--text-color-muted);">Your Phone Number (for reminders)</label>
+                            <input type="tel" name="USER_PHONE_NUMBER" id="user-phone" class="form-input mt-1 block w-full px-3 py-2 rounded-md shadow-sm">
+                        </div>
+                        <div>
+                            <label for="keywords" class="block text-sm font-medium" style="color: var(--text-color-muted);">Keywords (comma separated)</label>
+                            <textarea name="KEYWORDS" id="keywords" rows="4" class="form-input mt-1 block w-full px-3 py-2 rounded-md shadow-sm"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-8 pt-5" style="border-top: 1px solid var(--tab-nav-border);">
+                    <div class="flex justify-start items-center">
+                        <button type="submit" class="gradient-button w-full sm:w-auto inline-flex justify-center py-3 px-6 shadow-sm text-sm font-medium rounded-md text-white">
+                            Save Configuration
+                        </button>
+                        <span id="config-status" class="ml-4 text-sm"></span>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div id="email-monitor-card" class="tab-content card p-6 sm:p-8">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+                <div>
+                    <h2 class="text-xl font-semibold flex items-center"><i class="fas fa-envelope mr-3 text-purple-400"></i>Email Monitor</h2>
+                    <p class="mt-1" style="color: var(--text-color-muted);">Monitor email scanning activity in real-time</p>
+                </div>
+                <button id="check-emails-btn" class="gradient-button inline-flex justify-center py-2 px-4 shadow-sm text-sm font-medium rounded-md text-white w-full sm:w-auto">
+                    Check Emails Now
+                </button>
+            </div>
+            <div>
+                <h3 class="text-lg font-medium mb-2">Activity Log</h3>
+                <div id="activity-log" class="activity-log font-mono text-sm rounded-lg p-4 h-64 overflow-y-auto">
+                    <p class="text-gray-500"><i>Waiting to start... Click "Check Emails Now" to begin.</i></p>
+                </div>
+            </div>
+        </div>
+
+        <div id="scheduled-reminders-card" class="tab-content card p-6 sm:p-8">
+            <div class="mb-6">
+                <h2 class="text-xl font-semibold flex items-center"><i class="fas fa-calendar-check mr-3 text-green-400"></i>Scheduled Reminders</h2>
+                <p class="mt-1" style="color: var(--text-color-muted);">A list of all upcoming and completed reminder calls</p>
+            </div>
+            <div id="reminders-list" class="space-y-4 max-h-96 overflow-y-auto pr-2">
+                 <p class="text-center" style="color: var(--text-color-muted);">No reminders scheduled yet.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const tabs = document.querySelectorAll('.tab-link');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const themeToggleButton = document.getElementById('theme-toggle');
+        const sunIcon = document.getElementById('theme-icon-sun');
+        const moonIcon = document.getElementById('theme-icon-moon');
+        const body = document.body;
+        const configForm = document.getElementById('config-form');
+        const configStatus = document.getElementById('config-status');
+        const checkEmailsBtn = document.getElementById('check-emails-btn');
+        const activityLog = document.getElementById('activity-log');
+        const remindersList = document.getElementById('reminders-list');
+        let eventSource = null;
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', function (event) {
+                event.preventDefault();
+                tabs.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(content => content.classList.remove('active'));
+                this.classList.add('active');
+
+                let contentId;
+                if (this.id === 'config-tab') contentId = 'configuration-card';
+                else if (this.id === 'monitor-tab') contentId = 'email-monitor-card';
+                else {
+                    contentId = 'scheduled-reminders-card';
+                    fetchReminders();
+                }
+
+                const activeContent = document.getElementById(contentId);
+                if(activeContent) activeContent.classList.add('active');
+            });
+        });
+
+        const applyTheme = () => {
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+                body.classList.add('dark');
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+            } else {
+                body.classList.remove('dark');
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+            }
+        };
+        themeToggleButton.addEventListener('click', () => {
+            body.classList.toggle('dark');
+            const isDarkMode = body.classList.contains('dark');
+            localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+            sunIcon.classList.toggle('hidden', isDarkMode);
+            moonIcon.classList.toggle('hidden', !isDarkMode);
+        });
+
+        async function fetchConfig() {
+            try {
+                const response = await fetch('/config');
+                const config = await response.json();
+                document.getElementById('twilio-sid').value = config.TWILIO_ACCOUNT_SID;
+                document.getElementById('twilio-phone').value = config.TWILIO_PHONE_NUMBER;
+                document.getElementById('user-phone').value = config.USER_PHONE_NUMBER;
+                document.getElementById('keywords').value = (config.KEYWORDS || []).join(', ');
+            } catch (error) {
+                console.error('Error fetching config:', error);
+                configStatus.textContent = 'Error loading config.';
+                configStatus.className = 'ml-4 text-sm text-red-500';
+            }
+        }
+
+        configForm.addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const formData = new FormData(configForm);
+            const data = Object.fromEntries(formData.entries());
+
+            try {
+                const response = await fetch('/config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data),
+                });
+                const result = await response.json();
+                configStatus.textContent = result.message;
+                configStatus.className = 'ml-4 text-sm text-green-500';
+            } catch (error) {
+                configStatus.textContent = 'Failed to save.';
+                configStatus.className = 'ml-4 text-sm text-red-500';
+            }
+            setTimeout(() => configStatus.textContent = '', 3000);
+        });
+
+        checkEmailsBtn.addEventListener('click', function() {
+            if (eventSource && eventSource.readyState !== EventSource.CLOSED) {
+                eventSource.close();
+            }
+            activityLog.innerHTML = '';
+            checkEmailsBtn.disabled = true;
+            checkEmailsBtn.textContent = 'Checking...';
+
+            eventSource = new EventSource('/check-emails');
+
+            eventSource.onmessage = function(event) {
+                const data = JSON.parse(event.data);
+                const logEntry = document.createElement('p');
+                
+                let icon = '<i class="fas fa-info-circle mr-2"></i>';
+                let colorClass = 'text-cyan-400';
+                if (body.classList.contains('dark')) {
+                     switch(data.type) {
+                        case 'success': colorClass = 'text-green-400'; icon = '<i class="fas fa-check-circle mr-2"></i>'; break;
+                        case 'error': colorClass = 'text-red-400'; icon = '<i class="fas fa-times-circle mr-2"></i>'; break;
+                        case 'warn': colorClass = 'text-yellow-400'; icon = '<i class="fas fa-exclamation-triangle mr-2"></i>'; break;
+                        case 'neutral': colorClass = 'text-gray-500'; icon = '<i class="fas fa-search mr-2"></i>'; break;
+                    }
+                } else {
+                     switch(data.type) {
+                        case 'success': colorClass = 'text-green-600'; icon = '<i class="fas fa-check-circle mr-2"></i>'; break;
+                        case 'error': colorClass = 'text-red-600'; icon = '<i class="fas fa-times-circle mr-2"></i>'; break;
+                        case 'warn': colorClass = 'text-yellow-600'; icon = '<i class="fas fa-exclamation-triangle mr-2"></i>'; break;
+                        case 'neutral': colorClass = 'text-gray-500'; icon = '<i class="fas fa-search mr-2"></i>'; break;
+                        case 'info': colorClass = 'text-blue-600'; icon = '<i class="fas fa-info-circle mr-2"></i>'; break;
+                    }
+                }
+                
+                logEntry.innerHTML = `${icon} ${data.message}`;
+                logEntry.className = `${colorClass} mt-1`;
+                activityLog.appendChild(logEntry);
+                activityLog.scrollTop = activityLog.scrollHeight;
+            };
+
+            eventSource.onerror = function(error) {
+                console.error('EventSource failed:', error);
+                const errorEntry = document.createElement('p');
+                errorEntry.innerHTML = '<i class="fas fa-times-circle mr-2"></i> Connection lost. Process finished or an error occurred.';
+                errorEntry.className = 'text-red-500 mt-1';
+                activityLog.appendChild(errorEntry);
+                activityLog.scrollTop = activityLog.scrollHeight;
+                eventSource.close();
+                checkEmailsBtn.disabled = false;
+                checkEmailsBtn.textContent = 'Check Emails Now';
+            };
+        });
+
+        async function fetchReminders() {
+            try {
+                const response = await fetch('/reminders');
+                const reminders = await response.json();
+                remindersList.innerHTML = ''; 
+
+                if (reminders.length === 0) {
+                    remindersList.innerHTML = `<p class="text-center" style="color: var(--text-color-muted);">No reminders scheduled yet.</p>`;
+                    return;
+                }
+
+                reminders.forEach(r => {
+                    const statusClass = r.status.toLowerCase();
+                    const item = `
+                        <div class="reminder-item flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 rounded-lg gap-2">
+                            <div>
+                                <p class="font-semibold">${r.subject}</p>
+                                <p class="text-sm" style="color: var(--text-color-muted);">${r.scheduled_at} &nbsp;&bull;&nbsp; <span class="font-medium">${r.description}</span></p>
+                            </div>
+                            <span class="status-badge ${statusClass} inline-flex items-center px-3 py-1 rounded-full text-sm font-medium whitespace-nowrap">${r.status}</span>
+                        </div>
+                    `;
+                    remindersList.insertAdjacentHTML('beforeend', item);
+                });
+            } catch (error) {
+                console.error('Error fetching reminders:', error);
+                remindersList.innerHTML = `<p class="text-center text-red-500">Could not load reminders.</p>`;
+            }
+        }
+        
+        applyTheme();
+        fetchConfig();
+        fetchReminders();
+    });
+    </script>
+</body>
+</html>
